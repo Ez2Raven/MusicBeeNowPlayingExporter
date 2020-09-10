@@ -44,6 +44,9 @@ TBD
 What's all the bells and whistles this project can perform?
 * Export track information such as Music Artist, Track Title, Album Name and Cover Artwork with configurable default values.
 
+## Outstanding Features
+* Directory selection dialog to prompt user the location for generated output. (Currently, user has to provide path as string value)
+
 ## Contributing
 
 If you'd like to contribute, please fork the repository and use a feature

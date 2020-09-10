@@ -5,52 +5,59 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 
-
 namespace MusicBeePlugin
 {
     public partial class Plugin
     {
-        private MusicBeeApiInterface _mbApiInterface;
         private readonly PluginInfo _about = new PluginInfo();
-
+        private MusicBeeApiInterface _mbApiInterface;
 
         public PluginInfo Initialise(IntPtr apiInterfacePtr)
         {
-            //TODO: Add Serilog if .NET framework 4.5 can be used.
-
             _mbApiInterface = new MusicBeeApiInterface();
             _mbApiInterface.Initialise(apiInterfacePtr);
             _about.PluginInfoVersion = PluginInfoVersion;
-            _about.Name = "MusicBee Now Playing OBS Exporter";
-            _about.Description = "Export Now Playing music Metadata for OBS to consume and display during streaming.";
-            _about.Author = "Raven Ng";
-            _about.TargetApplication = "";   //  the name of a Plugin Storage device or panel header for a dockable panel
+            _about.Name = CustomSettings.Constants.Name;
+            _about.Description = CustomSettings.Constants.Description;
+            _about.Author = CustomSettings.Constants.Author;
+            _about.TargetApplication =
+                CustomSettings.Constants
+                    .TargetApplication;
             _about.Type = PluginType.General;
-            _about.VersionMajor = 1;  // your plugin version
-            _about.VersionMinor = 0;
-            _about.Revision = 0;
+            _about.VersionMajor = CustomSettings.Constants.VersionMajor;
+            _about.VersionMinor = CustomSettings.Constants.VersionMinor;
+            _about.Revision = CustomSettings.Constants.Revision;
             _about.MinInterfaceVersion = MinInterfaceVersion;
             _about.MinApiRevision = MinApiRevision;
-            _about.ReceiveNotifications = (ReceiveNotificationFlags.PlayerEvents | ReceiveNotificationFlags.TagEvents);
-            _about.ConfigurationPanelHeight = 0;   // height in pixels that musicbee should reserve in a panel for config settings. When set, a handle to an empty panel will be passed to the Configure function
+            _about.ReceiveNotifications = ReceiveNotificationFlags.PlayerEvents | ReceiveNotificationFlags.TagEvents;
+            _about.ConfigurationPanelHeight =
+                CustomSettings.Constants.ConfigurationPanelHeight;
+            CustomSettings.Persistence.MusicBeeAllocatedStoragePath =
+                _mbApiInterface.Setting_GetPersistentStoragePath();
+            
+            // Create default Output folder
+            Directory.CreateDirectory(CustomSettings.Persistence.PluginStoragePath);
+            
             return _about;
         }
 
         public bool Configure(IntPtr panelHandle)
         {
-            // save any persistent settings in a sub-folder of this path
-            string dataPath = _mbApiInterface.Setting_GetPersistentStoragePath();
+            // Read Json String from configuration file.
+            // Deserialize Json string and store into Customized Track Details Settings.
+
+            CustomSettings.Persistence.LoadPersistedPluginSettings();
+
             // panelHandle will only be set if you set about.ConfigurationPanelHeight to a non-zero value
             // keep in mind the panel width is scaled according to the font the user has selected
             // if about.ConfigurationPanelHeight is set to 0, you can display your own popup window
-            if (panelHandle != IntPtr.Zero)
+            if (panelHandle == IntPtr.Zero)
             {
-                Panel configPanel = (Panel)Panel.FromHandle(panelHandle);
-                Label prompt = new Label { AutoSize = true, Location = new Point(0, 0), Text = "prompt:" };
-                TextBox textBox = new TextBox();
-                textBox.Bounds = new Rectangle(60, 0, 100, textBox.Height);
-                configPanel.Controls.AddRange(new Control[] { prompt, textBox });
+                // show a windows form for configuration, since we initialize configuration panel height to 0.
+                SettingsForm settingsForm = new SettingsForm();
+                settingsForm.Show();
             }
+
             return false;
         }
 
@@ -59,7 +66,8 @@ namespace MusicBeePlugin
         public void SaveSettings()
         {
             // save any persistent settings in a sub-folder of this path
-            string dataPath = _mbApiInterface.Setting_GetPersistentStoragePath();
+            CustomSettings.Persistence.SavePluginSettings();
+
         }
 
         // MusicBee is closing the plugin (plugin is being disabled by user or MusicBee is shutting down)
@@ -70,6 +78,7 @@ namespace MusicBeePlugin
         // uninstall this plugin - clean up any persisted files
         public void Uninstall()
         {
+            CustomSettings.Persistence.PurgePluginFolder();
         }
 
         // receive event notifications from MusicBee
@@ -79,66 +88,82 @@ namespace MusicBeePlugin
             // perform some action depending on the notification type
             switch (type)
             {
-                case NotificationType.PluginStartup:
-                    // perform startup initialisation
-                    switch (_mbApiInterface.Player_GetPlayState())
-                    {
-                        case PlayState.Playing:
-                        case PlayState.Paused:
-                            // ...
-                            break;
-                    }
-                    break;
 
                 case NotificationType.TrackChanged:
-                    string artist = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.Artist);
-                    if (string.IsNullOrWhiteSpace(artist))
+                    try
                     {
-                        artist = "Ask me: Artist Name";
-                    }
-                    using (StreamWriter sw =
-                        new StreamWriter(@"F:\VideoEditing\Source\music-covers\Artist.txt", false))
-                    {
-                        sw.Write(artist);
-                    }
+                        var artist = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.Artist);
+                        if (string.IsNullOrWhiteSpace(artist))
+                            artist = CustomSettings.TrackDetails.Instance.DefaultArtistName;
 
-                    string title = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.TrackTitle);
-                    if (string.IsNullOrWhiteSpace(title))
-                    {
-                        title = "Ask me: Track Title";
-                    }
-                    using (StreamWriter sw =
-                        new StreamWriter(@"F:\VideoEditing\Source\music-covers\Title.txt", false))
-                    {
-                        sw.Write(title);
-                    }
 
-                    string album = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.Album);
-                    if (string.IsNullOrWhiteSpace(album))
-                    {
-                        album = "Ask me: Album Name";
-                    }
-                    using (StreamWriter sw =
-                        new StreamWriter(@"F:\VideoEditing\Source\music-covers\Album.txt", false))
-                    {
-                        sw.Write(album);
-                    }
+                        using (var sw =
+                            new StreamWriter(CustomSettings.TrackDetails.Instance.ArtistNameOutputPath, false))
+                        {
+                            sw.Write(artist);
+                        }
 
-                    var artwork = _mbApiInterface.NowPlaying_GetArtwork();
-                    if (string.IsNullOrWhiteSpace(artwork))
-                    {
-                        artwork = "R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==";
+                        var title = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.TrackTitle);
+                        if (string.IsNullOrWhiteSpace(title))
+                            title = CustomSettings.TrackDetails.Instance.DefaultTrackTitle;
+                        using (var sw =
+                            new StreamWriter(CustomSettings.TrackDetails.Instance.TrackTitleOutputPath, false))
+                        {
+                            sw.Write(title);
+                        }
+
+                        var album = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.Album);
+                        if (string.IsNullOrWhiteSpace(album))
+                            album = CustomSettings.TrackDetails.Instance.DefaultAlbumName;
+                        using (var sw =
+                            new StreamWriter(CustomSettings.TrackDetails.Instance.AlbumNameOutputPath, false))
+                        {
+                            sw.Write(album);
+                        }
+
+                        var artwork = _mbApiInterface.NowPlaying_GetArtwork();
+                        if (string.IsNullOrWhiteSpace(artwork))
+                            artwork = CustomSettings.TrackDetails.Instance.DefaultCoverArt;
+
+                        var resizedArtworkImage = ResizedArtworkImage(artwork,
+                            CustomSettings.TrackDetails.Instance.ArtworkOutputWidth,
+                            CustomSettings.TrackDetails.Instance.ArtworkOutputHeight);
+                        resizedArtworkImage.Save(CustomSettings.TrackDetails.Instance.ArtworkOutputPath);
                     }
-                    
-                    var resizedArtworkImage = ResizedArtworkImage(artwork, 300, 300);
-                    resizedArtworkImage.Save(@"F:\VideoEditing\Source\music-covers\Cover.jpg");
+                    catch (UnauthorizedAccessException unauthorizedAccessException)
+                    {
+                        Form simpleErrorDialog = new Form();
+                        simpleErrorDialog.Text =
+                            $@"Plugin does not have permission to store files in defined output folder. {Environment.NewLine} {unauthorizedAccessException.Message} ";
+                        simpleErrorDialog.ShowDialog();
+                    }
+                    catch (DirectoryNotFoundException directoryNotFoundException)
+                    {
+                        Form simpleErrorDialog = new Form();
+                        simpleErrorDialog.Text =
+                            $@"Invalid output file path, Please check plugin settings. {Environment.NewLine} {directoryNotFoundException.Message} ";
+                        simpleErrorDialog.ShowDialog();
+                    }
+                    catch (IOException ioException)
+                    {
+                        Form simpleErrorDialog = new Form();
+                        simpleErrorDialog.Text =
+                            $@"Invalid output file, Please check plugin settings. {Environment.NewLine} {ioException.Message} ";
+                        simpleErrorDialog.ShowDialog();
+                    }
+                    catch (Exception ex)
+                    {
+                        Form simpleErrorDialog = new Form();
+                        simpleErrorDialog.Text = $@"Woops, Something went wrong here. Please raise an issue at https://github.com/demandous/MusicBeeNowPlayingExporter with the following details: {Environment.NewLine} {ex} ";
+                        simpleErrorDialog.ShowDialog();
+                    }
 
                     break;
             }
         }
 
         /// <summary>
-        /// Renders a base64 image and resize it to the required width and height in high quality.
+        ///     Renders a base64 image and resize it to the required width and height in high quality.
         /// </summary>
         /// <param name="artworkBase64"></param>
         /// <param name="width"></param>
@@ -147,16 +172,16 @@ namespace MusicBeePlugin
         private static Bitmap ResizedArtworkImage(string artworkBase64, int width, int height)
         {
             //Convert Base64 to image.
-            byte[] imageBytes = Convert.FromBase64String(artworkBase64);
+            var imageBytes = Convert.FromBase64String(artworkBase64);
 
             Image artworkImage;
-            using (MemoryStream ms = new MemoryStream(imageBytes))
+            using (var ms = new MemoryStream(imageBytes))
             {
                 artworkImage = Image.FromStream(ms);
             }
 
             // now that the image is loaded in memory, we'll resize it.
-            
+
             var destRect = new Rectangle(0, 0, width, height);
             var resizedArtworkImage = new Bitmap(width, height);
 
@@ -239,6 +264,5 @@ namespace MusicBeePlugin
         //    e.Graphics.Clear(Color.Red);
         //    TextRenderer.DrawText(e.Graphics, "hello", SystemFonts.CaptionFont, new Point(10, 10), Color.Blue);
         //}
-
     }
 }
