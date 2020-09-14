@@ -8,13 +8,13 @@
         /// <summary>
         ///     Plug-in's name
         /// </summary>
-        public const string Name = "MusicBee Now Playing OBS Exporter";
+        public const string Name = "MusicBee Now Playing Exporter";
 
         /// <summary>
         ///     Plug-in's Description
         /// </summary>
         public const string Description =
-            "Export Now Playing music Metadata for OBS to consume and display during streaming.";
+            "Export Now Playing music Metadata so that they can be display within streaming software.";
 
         public const string Author = "Raven Ng";
 
