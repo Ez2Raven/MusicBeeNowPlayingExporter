@@ -23,8 +23,8 @@ namespace MusicBeeExporter.Configurations
 
     public class PersistenceSettings : IPersistenceSettings
     {
-        public const string FolderName = "ObsExporterPlugin";
-        public const string TrackDetailFilename = "MusicBeeExporterSettings.json";
+        private const string FolderName = "MusicBeeExporterPlugin";
+        private const string TrackDetailFilename = "MusicBeeExporterSettings.json";
 
         private const string DefaultArtworkOutputFilename = "cover.png";
         private const string DefaultArtistNameOutputFilename = "artist.txt";

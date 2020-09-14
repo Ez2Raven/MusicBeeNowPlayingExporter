@@ -1,4 +1,4 @@
-# MusicBee Now Playing OBS Exporter
+# MusicBee Now Playing Exporter
 > based on MusicBee API v3.1
 
 Plugin to export track information to an easily consumable format for OBS to display during streaming.
