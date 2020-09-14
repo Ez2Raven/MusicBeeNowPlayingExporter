@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using MusicBeeExporter.Configurations;
 using MusicBeeExporter.ImageProcessing;
@@ -102,9 +103,6 @@ namespace MusicBeePlugin
         public void Uninstall()
         {
             _repo.PurgePluginStorageFolder();
-
-            var assembly = typeof(MusicBeeApiInterface).Assembly;
-            _mbApiInterface.MB_UninstallPlugin($"{assembly.GetName().Name}", string.Empty);
         }
 
         // receive event notifications from MusicBee
