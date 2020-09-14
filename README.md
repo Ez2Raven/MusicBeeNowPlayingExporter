@@ -8,6 +8,9 @@ Plugin to export track information to an easily consumable format for OBS to dis
 Follow the (tutorial)[https://musicbee.fandom.com/wiki/Tutorial:_Creating_A_Simple_Plugin] on 
 Setting up your IDE and getting started with developing a simple MusicBee Plugin
 
+### MusicBee Plugin Lifecycle
+TBC
+
 ### Initial Configuration
 
 Add your copy of MusicBee.exe as a project reference to this solution.
@@ -46,6 +49,7 @@ What's all the bells and whistles this project can perform?
 
 ## Outstanding Features
 * Directory selection dialog to prompt user the location for generated output. (Currently, user has to provide path as string value)
+* Identify plugin folder path to remove referenced assemblies
 
 ## Contributing
 

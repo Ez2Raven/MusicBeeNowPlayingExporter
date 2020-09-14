@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
+using MusicBeeExporter.Configurations;
+using MusicBeeExporter.ImageProcessing;
+using Newtonsoft.Json;
 
 namespace MusicBeePlugin
 {
@@ -11,50 +11,75 @@ namespace MusicBeePlugin
     {
         private readonly PluginInfo _about = new PluginInfo();
         private MusicBeeApiInterface _mbApiInterface;
+        private IMusicBeeExporterSettings _pluginSettings;
+        private IPersistence _repo;
 
         public PluginInfo Initialise(IntPtr apiInterfacePtr)
         {
-            _mbApiInterface = new MusicBeeApiInterface();
-            _mbApiInterface.Initialise(apiInterfacePtr);
-            _about.PluginInfoVersion = PluginInfoVersion;
-            _about.Name = CustomSettings.Constants.Name;
-            _about.Description = CustomSettings.Constants.Description;
-            _about.Author = CustomSettings.Constants.Author;
-            _about.TargetApplication =
-                CustomSettings.Constants
-                    .TargetApplication;
-            _about.Type = PluginType.General;
-            _about.VersionMajor = CustomSettings.Constants.VersionMajor;
-            _about.VersionMinor = CustomSettings.Constants.VersionMinor;
-            _about.Revision = CustomSettings.Constants.Revision;
-            _about.MinInterfaceVersion = MinInterfaceVersion;
-            _about.MinApiRevision = MinApiRevision;
-            _about.ReceiveNotifications = ReceiveNotificationFlags.PlayerEvents | ReceiveNotificationFlags.TagEvents;
-            _about.ConfigurationPanelHeight =
-                CustomSettings.Constants.ConfigurationPanelHeight;
-            CustomSettings.Persistence.MusicBeeAllocatedStoragePath =
-                _mbApiInterface.Setting_GetPersistentStoragePath();
-            
-            // Create default Output folder
-            Directory.CreateDirectory(CustomSettings.Persistence.PluginStoragePath);
-            
+            try
+            {
+                _mbApiInterface = new MusicBeeApiInterface();
+                _mbApiInterface.Initialise(apiInterfacePtr);
+                _about.PluginInfoVersion = PluginInfoVersion;
+                _about.Name = MusicBeeExporterConstants.Name;
+                _about.Description = MusicBeeExporterConstants.Description;
+                _about.Author = MusicBeeExporterConstants.Author;
+                _about.TargetApplication =
+                    MusicBeeExporterConstants
+                        .TargetApplication;
+                _about.Type = PluginType.General;
+                _about.VersionMajor = MusicBeeExporterConstants.VersionMajor;
+                _about.VersionMinor = MusicBeeExporterConstants.VersionMinor;
+                _about.Revision = MusicBeeExporterConstants.Revision;
+                _about.MinInterfaceVersion = MinInterfaceVersion;
+                _about.MinApiRevision = MinApiRevision;
+                _about.ReceiveNotifications =
+                    ReceiveNotificationFlags.PlayerEvents | ReceiveNotificationFlags.TagEvents;
+                _about.ConfigurationPanelHeight =
+                    MusicBeeExporterConstants.ConfigurationPanelHeight;
+
+                // Initialize the plugin after music bee api interface is initialized and the PersistentStoragePath is accessible
+                IPersistenceSettings persistenceSettings = new PersistenceSettings
+                {
+                    MusicBeeAllocatedStoragePath = _mbApiInterface.Setting_GetPersistentStoragePath()
+                };
+
+
+                // Create Plugin Storage folder
+                Directory.CreateDirectory(persistenceSettings.PluginStorageDirectory);
+
+                _repo = new Persistence(persistenceSettings);
+
+                // Load exporter settings if it exists, otherwise create a new settings file.
+                var settingJson = _repo.LoadPluginSettings();
+
+                if (!string.IsNullOrWhiteSpace(settingJson))
+                {
+                    _pluginSettings = JsonConvert.DeserializeObject<MusicBeeExporterSettings>(settingJson);
+                }
+                else
+                {
+                    _pluginSettings = new MusicBeeExporterSettings(persistenceSettings);
+                    _repo.SavePluginSettings(_pluginSettings);
+                }
+            }
+            catch (Exception ex)
+            {
+                PromptToCaptureExceptionMessage(ex);
+            }
+
             return _about;
         }
 
         public bool Configure(IntPtr panelHandle)
         {
-            // Read Json String from configuration file.
-            // Deserialize Json string and store into Customized Track Details Settings.
-
-            CustomSettings.Persistence.LoadPersistedPluginSettings();
-
             // panelHandle will only be set if you set about.ConfigurationPanelHeight to a non-zero value
             // keep in mind the panel width is scaled according to the font the user has selected
             // if about.ConfigurationPanelHeight is set to 0, you can display your own popup window
             if (panelHandle == IntPtr.Zero)
             {
                 // show a windows form for configuration, since we initialize configuration panel height to 0.
-                SettingsForm settingsForm = new SettingsForm();
+                var settingsForm = new SettingsForm(_pluginSettings, _repo);
                 settingsForm.Show();
             }
 
@@ -65,9 +90,7 @@ namespace MusicBeePlugin
         // its up to you to figure out whether anything has changed and needs updating
         public void SaveSettings()
         {
-            // save any persistent settings in a sub-folder of this path
-            CustomSettings.Persistence.SavePluginSettings();
-
+            // plugin settings state is handled by the settings form
         }
 
         // MusicBee is closing the plugin (plugin is being disabled by user or MusicBee is shutting down)
@@ -78,7 +101,10 @@ namespace MusicBeePlugin
         // uninstall this plugin - clean up any persisted files
         public void Uninstall()
         {
-            CustomSettings.Persistence.PurgePluginFolder();
+            _repo.PurgePluginStorageFolder();
+
+            var assembly = typeof(MusicBeeApiInterface).Assembly;
+            _mbApiInterface.MB_UninstallPlugin($"{assembly.GetName().Name}", string.Empty);
         }
 
         // receive event notifications from MusicBee
@@ -88,74 +114,64 @@ namespace MusicBeePlugin
             // perform some action depending on the notification type
             switch (type)
             {
-
                 case NotificationType.TrackChanged:
                     try
                     {
                         var artist = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.Artist);
                         if (string.IsNullOrWhiteSpace(artist))
-                            artist = CustomSettings.TrackDetails.Instance.DefaultArtistName;
-
+                            artist = _pluginSettings.DefaultArtistName;
 
                         using (var sw =
-                            new StreamWriter(CustomSettings.TrackDetails.Instance.ArtistNameOutputPath, false))
+                            new StreamWriter(_pluginSettings.ArtistNameOutputPath, false))
                         {
                             sw.Write(artist);
                         }
 
                         var title = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.TrackTitle);
                         if (string.IsNullOrWhiteSpace(title))
-                            title = CustomSettings.TrackDetails.Instance.DefaultTrackTitle;
+                            title = _pluginSettings.DefaultTrackTitle;
                         using (var sw =
-                            new StreamWriter(CustomSettings.TrackDetails.Instance.TrackTitleOutputPath, false))
+                            new StreamWriter(_pluginSettings.TrackTitleOutputPath, false))
                         {
                             sw.Write(title);
                         }
 
                         var album = _mbApiInterface.NowPlaying_GetFileTag(MetaDataType.Album);
                         if (string.IsNullOrWhiteSpace(album))
-                            album = CustomSettings.TrackDetails.Instance.DefaultAlbumName;
+                            album = _pluginSettings.DefaultAlbumName;
                         using (var sw =
-                            new StreamWriter(CustomSettings.TrackDetails.Instance.AlbumNameOutputPath, false))
+                            new StreamWriter(_pluginSettings.AlbumNameOutputPath, false))
                         {
                             sw.Write(album);
                         }
 
                         var artwork = _mbApiInterface.NowPlaying_GetArtwork();
                         if (string.IsNullOrWhiteSpace(artwork))
-                            artwork = CustomSettings.TrackDetails.Instance.DefaultCoverArt;
+                            artwork = _pluginSettings.DefaultCoverArt;
 
-                        var resizedArtworkImage = ResizedArtworkImage(artwork,
-                            CustomSettings.TrackDetails.Instance.ArtworkOutputWidth,
-                            CustomSettings.TrackDetails.Instance.ArtworkOutputHeight);
-                        resizedArtworkImage.Save(CustomSettings.TrackDetails.Instance.ArtworkOutputPath);
+                        var resizedArtworkImage = ImageHelper.ResizedArtworkImage(artwork,
+                            _pluginSettings.ArtworkOutputWidth,
+                            _pluginSettings.ArtworkOutputHeight);
+                        resizedArtworkImage.Save(_pluginSettings.ArtworkOutputPath);
                     }
                     catch (UnauthorizedAccessException unauthorizedAccessException)
                     {
-                        Form simpleErrorDialog = new Form();
-                        simpleErrorDialog.Text =
-                            $@"Plugin does not have permission to store files in defined output folder. {Environment.NewLine} {unauthorizedAccessException.Message} ";
-                        simpleErrorDialog.ShowDialog();
+                        PromptToCaptureExceptionMessage(unauthorizedAccessException,
+                            "Plugin does not have permission to store files in defined output folder.");
                     }
                     catch (DirectoryNotFoundException directoryNotFoundException)
                     {
-                        Form simpleErrorDialog = new Form();
-                        simpleErrorDialog.Text =
-                            $@"Invalid output file path, Please check plugin settings. {Environment.NewLine} {directoryNotFoundException.Message} ";
-                        simpleErrorDialog.ShowDialog();
+                        PromptToCaptureExceptionMessage(directoryNotFoundException,
+                            "Invalid output file path, Please check plugin settings.");
                     }
                     catch (IOException ioException)
                     {
-                        Form simpleErrorDialog = new Form();
-                        simpleErrorDialog.Text =
-                            $@"Invalid output file, Please check plugin settings. {Environment.NewLine} {ioException.Message} ";
-                        simpleErrorDialog.ShowDialog();
+                        PromptToCaptureExceptionMessage(ioException,
+                            @"Invalid output file, Please check plugin settings");
                     }
                     catch (Exception ex)
                     {
-                        Form simpleErrorDialog = new Form();
-                        simpleErrorDialog.Text = $@"Woops, Something went wrong here. Please raise an issue at https://github.com/demandous/MusicBeeNowPlayingExporter with the following details: {Environment.NewLine} {ex} ";
-                        simpleErrorDialog.ShowDialog();
+                        PromptToCaptureExceptionMessage(ex);
                     }
 
                     break;
@@ -163,47 +179,22 @@ namespace MusicBeePlugin
         }
 
         /// <summary>
-        ///     Renders a base64 image and resize it to the required width and height in high quality.
+        ///     Display a friendly message to the user when an exception occurs, also prompts the user to store the exception
+        ///     message in the clipboard for easier reporting.
         /// </summary>
-        /// <param name="artworkBase64"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        private static Bitmap ResizedArtworkImage(string artworkBase64, int width, int height)
+        /// <param name="friendlyMessage"></param>
+        /// <param name="exception"></param>
+        /// <returns><see cref="DialogResult" /> for addition processing if required</returns>
+        private static DialogResult PromptToCaptureExceptionMessage(Exception exception, string friendlyMessage = null)
         {
-            //Convert Base64 to image.
-            var imageBytes = Convert.FromBase64String(artworkBase64);
+            if (string.IsNullOrWhiteSpace(friendlyMessage)) friendlyMessage = "Oops, Something unexpected happened.";
 
-            Image artworkImage;
-            using (var ms = new MemoryStream(imageBytes))
-            {
-                artworkImage = Image.FromStream(ms);
-            }
+            var shouldStoreExceptionInClipboard = MessageBox.Show(
+                $@"{friendlyMessage} {Environment.NewLine} 
+                     If you can't resolve this on your own, please report an issue at https://github.com/demandous/MusicBeeNowPlayingExporter {Environment.NewLine} 
+                     {exception.Message}");
 
-            // now that the image is loaded in memory, we'll resize it.
-
-            var destRect = new Rectangle(0, 0, width, height);
-            var resizedArtworkImage = new Bitmap(width, height);
-
-            resizedArtworkImage.SetResolution(artworkImage.HorizontalResolution, artworkImage.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(resizedArtworkImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(artworkImage, destRect, 0, 0, artworkImage.Width, artworkImage.Height,
-                        GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return resizedArtworkImage;
+            return shouldStoreExceptionInClipboard;
         }
 
         // return an array of lyric or artworkBase64 provider names this plugin supports
