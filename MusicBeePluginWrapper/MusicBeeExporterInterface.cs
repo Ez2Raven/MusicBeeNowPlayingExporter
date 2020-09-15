@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
-using System.Windows.Forms;
 using MusicBeeExporter.Configurations;
 using MusicBeeExporter.ImageProcessing;
 using Newtonsoft.Json;
@@ -66,7 +64,7 @@ namespace MusicBeePlugin
             }
             catch (Exception ex)
             {
-                PromptToCaptureExceptionMessage(ex);
+                UIHelper.DisplayExceptionDialog(ex);
             }
 
             return _about;
@@ -154,45 +152,26 @@ namespace MusicBeePlugin
                     }
                     catch (UnauthorizedAccessException unauthorizedAccessException)
                     {
-                        PromptToCaptureExceptionMessage(unauthorizedAccessException,
+                        UIHelper.DisplayExceptionDialog(unauthorizedAccessException,
                             "Plugin does not have permission to store files in defined output folder.");
                     }
                     catch (DirectoryNotFoundException directoryNotFoundException)
                     {
-                        PromptToCaptureExceptionMessage(directoryNotFoundException,
+                        UIHelper.DisplayExceptionDialog(directoryNotFoundException,
                             "Invalid output file path, Please check plugin settings.");
                     }
                     catch (IOException ioException)
                     {
-                        PromptToCaptureExceptionMessage(ioException,
+                        UIHelper.DisplayExceptionDialog(ioException,
                             @"Invalid output file, Please check plugin settings");
                     }
                     catch (Exception ex)
                     {
-                        PromptToCaptureExceptionMessage(ex);
+                        UIHelper.DisplayExceptionDialog(ex);
                     }
 
                     break;
             }
-        }
-
-        /// <summary>
-        ///     Display a friendly message to the user when an exception occurs, also prompts the user to store the exception
-        ///     message in the clipboard for easier reporting.
-        /// </summary>
-        /// <param name="friendlyMessage"></param>
-        /// <param name="exception"></param>
-        /// <returns><see cref="DialogResult" /> for addition processing if required</returns>
-        private static DialogResult PromptToCaptureExceptionMessage(Exception exception, string friendlyMessage = null)
-        {
-            if (string.IsNullOrWhiteSpace(friendlyMessage)) friendlyMessage = "Oops, Something unexpected happened.";
-
-            var shouldStoreExceptionInClipboard = MessageBox.Show(
-                $@"{friendlyMessage} {Environment.NewLine} 
-                     If you can't resolve this on your own, please report an issue at https://github.com/demandous/MusicBeeNowPlayingExporter {Environment.NewLine} 
-                     {exception.Message}");
-
-            return shouldStoreExceptionInClipboard;
         }
 
         // return an array of lyric or artworkBase64 provider names this plugin supports
