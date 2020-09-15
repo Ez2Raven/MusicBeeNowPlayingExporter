@@ -4,7 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace MusicBeeExporter.ImageProcessing
+namespace MusicBeeExporter.Imaging
 {
     public class ImageHelper
     {

@@ -82,6 +82,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomForms\GenerateCustomizedOutputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CustomForms\GenerateCustomizedOutputForm.Designer.cs">
+      <DependentUpon>GenerateCustomizedOutputForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MusicBeeInterface.cs" />
     <Compile Include="MusicBeeExporterInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +126,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CustomForms\GenerateCustomizedOutputForm.resx">
+      <DependentUpon>GenerateCustomizedOutputForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CustomForms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>

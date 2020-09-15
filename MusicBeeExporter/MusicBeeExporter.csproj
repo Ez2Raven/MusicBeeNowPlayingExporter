@@ -52,7 +52,7 @@
     <Compile Include="Configurations\Persistence.cs" />
     <Compile Include="Configurations\MusicBeeExporterSettings.cs" />
     <Compile Include="Configurations\PersistenceSettings.cs" />
-    <Compile Include="ImageProcessing\ImageHelper.cs" />
+    <Compile Include="Imaging\ImageHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
