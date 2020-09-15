@@ -18,6 +18,9 @@ Add your copy of MusicBee.exe as a project reference to this solution.
 While you may have installed MusicBee on your operating system, I would strong recommend using 
 the portable version to avoid messing things up on your day-to-day MusicBee installation.
 
+You will also need to modify the Post Build Event within MusicBeePluginWrapper to copy 
+build artifacts to the plugin folder of your Portable MusicBee installation
+
 
 ## Developing
 
