@@ -26,21 +26,35 @@ namespace MusicBeePlugin
             txtTrackTitleOutputFile.Text = _settings.TrackTitleOutputPath;
             txtAlbumOutputFile.Text = _settings.AlbumNameOutputPath;
             txtArtworkOutputFile.Text = _settings.ArtworkOutputPath;
+            txtArtworkWidth.Text = _settings.ArtworkOutputWidth.ToString();
+            txtArtworkHeight.Text = _settings.ArtworkOutputHeight.ToString();
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            _settings.DefaultArtistName = txtDefaultArtist.Text;
-            _settings.DefaultTrackTitle = txtDefaultTrackTitle.Text;
-            _settings.DefaultAlbumName = txtDefaultAlbumName.Text;
+            try
+            {
+                _settings.ArtworkOutputWidth = int.Parse(txtArtworkWidth.Text);
+                _settings.ArtworkOutputHeight = int.Parse(txtArtworkHeight.Text);
+                _settings.DefaultArtistName = txtDefaultArtist.Text;
+                _settings.DefaultTrackTitle = txtDefaultTrackTitle.Text;
+                _settings.DefaultAlbumName = txtDefaultAlbumName.Text;
 
-            _settings.ArtistNameOutputPath = txtArtistOutputFile.Text;
-            _settings.TrackTitleOutputPath = txtTrackTitleOutputFile.Text;
-            _settings.AlbumNameOutputPath = txtAlbumOutputFile.Text;
-            _settings.ArtworkOutputPath = txtArtworkOutputFile.Text;
+                _settings.ArtistNameOutputPath = txtArtistOutputFile.Text;
+                _settings.TrackTitleOutputPath = txtTrackTitleOutputFile.Text;
+                _settings.AlbumNameOutputPath = txtAlbumOutputFile.Text;
+                _settings.ArtworkOutputPath = txtArtworkOutputFile.Text;
 
-            _repo.SavePluginSettings(_settings);
-            Close();
+                _repo.SavePluginSettings(_settings);
+                Close();
+            }
+            catch (FormatException)
+            {
+                UIHelper.DisplayMessageDialog(
+                    "Artwork Height & Width must contain numbers only. Please modify them and save again.");
+
+                txtArtworkWidth.Focus();
+            }
         }
 
         private void btnExit_Click(object sender, EventArgs e)

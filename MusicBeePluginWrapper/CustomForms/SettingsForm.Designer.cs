@@ -31,20 +31,24 @@
             this.lblDefaultArtistName = new System.Windows.Forms.Label();
             this.txtDefaultArtist = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.lblDefaultTrackTitle = new System.Windows.Forms.Label();
             this.txtDefaultTrackTitle = new System.Windows.Forms.TextBox();
+            this.lblDefaultTrackTitle = new System.Windows.Forms.Label();
             this.lblDefaultAlbumName = new System.Windows.Forms.Label();
             this.txtDefaultAlbumName = new System.Windows.Forms.TextBox();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnExit = new System.Windows.Forms.Button();
             this.lblArtistOutputFile = new System.Windows.Forms.Label();
             this.txtArtistOutputFile = new System.Windows.Forms.TextBox();
             this.lblTrackTitleOutputFile = new System.Windows.Forms.Label();
             this.txtTrackTitleOutputFile = new System.Windows.Forms.TextBox();
-            this.lblAlbumOutputFile = new System.Windows.Forms.Label();
             this.txtAlbumOutputFile = new System.Windows.Forms.TextBox();
-            this.lblArtworkOutputFile = new System.Windows.Forms.Label();
+            this.lblAlbumOutputFile = new System.Windows.Forms.Label();
             this.txtArtworkOutputFile = new System.Windows.Forms.TextBox();
+            this.lblArtworkOutputFile = new System.Windows.Forms.Label();
+            this.lblArtworkWidth = new System.Windows.Forms.Label();
+            this.lblArtworkHeight = new System.Windows.Forms.Label();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnExit = new System.Windows.Forms.Button();
+            this.txtArtworkWidth = new System.Windows.Forms.TextBox();
+            this.txtArtworkHeight = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -88,13 +92,17 @@
             this.tableLayoutPanel1.Controls.Add(this.lblTrackTitleOutputFile, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.txtTrackTitleOutputFile, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.txtAlbumOutputFile, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.lblArtworkOutputFile, 0, 6);
             this.tableLayoutPanel1.Controls.Add(this.lblAlbumOutputFile, 0, 5);
             this.tableLayoutPanel1.Controls.Add(this.txtArtworkOutputFile, 1, 6);
+            this.tableLayoutPanel1.Controls.Add(this.lblArtworkOutputFile, 0, 6);
+            this.tableLayoutPanel1.Controls.Add(this.lblArtworkWidth, 0, 7);
+            this.tableLayoutPanel1.Controls.Add(this.lblArtworkHeight, 0, 8);
+            this.tableLayoutPanel1.Controls.Add(this.txtArtworkWidth, 1, 7);
+            this.tableLayoutPanel1.Controls.Add(this.txtArtworkHeight, 1, 8);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 8;
+            this.tableLayoutPanel1.RowCount = 10;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -103,8 +111,20 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(800, 369);
             this.tableLayoutPanel1.TabIndex = 3;
+            // 
+            // txtDefaultTrackTitle
+            // 
+            this.txtDefaultTrackTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtDefaultTrackTitle.Location = new System.Drawing.Point(159, 33);
+            this.txtDefaultTrackTitle.Name = "txtDefaultTrackTitle";
+            this.txtDefaultTrackTitle.Size = new System.Drawing.Size(658, 22);
+            this.txtDefaultTrackTitle.TabIndex = 4;
             // 
             // lblDefaultTrackTitle
             // 
@@ -118,16 +138,6 @@
             this.lblDefaultTrackTitle.TabIndex = 3;
             this.lblDefaultTrackTitle.Text = "Default Track Title";
             this.lblDefaultTrackTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // txtDefaultTrackTitle
-            // 
-            this.txtDefaultTrackTitle.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDefaultTrackTitle.Location = new System.Drawing.Point(159, 33);
-            this.txtDefaultTrackTitle.Name = "txtDefaultTrackTitle";
-            this.txtDefaultTrackTitle.Size = new System.Drawing.Size(658, 22);
-            this.txtDefaultTrackTitle.TabIndex = 4;
             // 
             // lblDefaultAlbumName
             // 
@@ -151,31 +161,6 @@
             this.txtDefaultAlbumName.Name = "txtDefaultAlbumName";
             this.txtDefaultAlbumName.Size = new System.Drawing.Size(658, 22);
             this.txtDefaultAlbumName.TabIndex = 6;
-            // 
-            // btnSave
-            // 
-            this.btnSave.AutoSize = true;
-            this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSave.Location = new System.Drawing.Point(0, 375);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(396, 75);
-            this.btnSave.TabIndex = 0;
-            this.btnSave.Text = "Save and Exit";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnExit
-            // 
-            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExit.AutoSize = true;
-            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExit.Location = new System.Drawing.Point(402, 375);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(396, 75);
-            this.btnExit.TabIndex = 4;
-            this.btnExit.Text = "Exit Without Saving";
-            this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // lblArtistOutputFile
             // 
@@ -223,6 +208,16 @@
             this.txtTrackTitleOutputFile.Size = new System.Drawing.Size(658, 22);
             this.txtTrackTitleOutputFile.TabIndex = 10;
             // 
+            // txtAlbumOutputFile
+            // 
+            this.txtAlbumOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtAlbumOutputFile.Location = new System.Drawing.Point(159, 149);
+            this.txtAlbumOutputFile.Name = "txtAlbumOutputFile";
+            this.txtAlbumOutputFile.Size = new System.Drawing.Size(658, 22);
+            this.txtAlbumOutputFile.TabIndex = 12;
+            // 
             // lblAlbumOutputFile
             // 
             this.lblAlbumOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -236,15 +231,15 @@
             this.lblAlbumOutputFile.Text = "Album Output File";
             this.lblAlbumOutputFile.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // txtAlbumOutputFile
+            // txtArtworkOutputFile
             // 
-            this.txtAlbumOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txtArtworkOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtAlbumOutputFile.Location = new System.Drawing.Point(159, 149);
-            this.txtAlbumOutputFile.Name = "txtAlbumOutputFile";
-            this.txtAlbumOutputFile.Size = new System.Drawing.Size(658, 22);
-            this.txtAlbumOutputFile.TabIndex = 12;
+            this.txtArtworkOutputFile.Location = new System.Drawing.Point(159, 178);
+            this.txtArtworkOutputFile.Name = "txtArtworkOutputFile";
+            this.txtArtworkOutputFile.Size = new System.Drawing.Size(658, 22);
+            this.txtArtworkOutputFile.TabIndex = 14;
             // 
             // lblArtworkOutputFile
             // 
@@ -259,15 +254,75 @@
             this.lblArtworkOutputFile.Text = "Artwork Output File";
             this.lblArtworkOutputFile.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // txtArtworkOutputFile
+            // lblArtworkWidth
             // 
-            this.txtArtworkOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lblArtworkWidth.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtArtworkOutputFile.Location = new System.Drawing.Point(159, 178);
-            this.txtArtworkOutputFile.Name = "txtArtworkOutputFile";
-            this.txtArtworkOutputFile.Size = new System.Drawing.Size(658, 22);
-            this.txtArtworkOutputFile.TabIndex = 14;
+            this.lblArtworkWidth.AutoSize = true;
+            this.lblArtworkWidth.Location = new System.Drawing.Point(4, 204);
+            this.lblArtworkWidth.Name = "lblArtworkWidth";
+            this.lblArtworkWidth.Size = new System.Drawing.Size(148, 28);
+            this.lblArtworkWidth.TabIndex = 15;
+            this.lblArtworkWidth.Text = "Artwork Width (px)";
+            this.lblArtworkWidth.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // lblArtworkHeight
+            // 
+            this.lblArtworkHeight.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblArtworkHeight.AutoSize = true;
+            this.lblArtworkHeight.Location = new System.Drawing.Point(4, 233);
+            this.lblArtworkHeight.Name = "lblArtworkHeight";
+            this.lblArtworkHeight.Size = new System.Drawing.Size(148, 28);
+            this.lblArtworkHeight.TabIndex = 17;
+            this.lblArtworkHeight.Text = "Artwork Height (px)";
+            this.lblArtworkHeight.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // btnSave
+            // 
+            this.btnSave.AutoSize = true;
+            this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSave.Location = new System.Drawing.Point(0, 375);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(396, 75);
+            this.btnSave.TabIndex = 0;
+            this.btnSave.Text = "Save and Exit";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnExit
+            // 
+            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExit.AutoSize = true;
+            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExit.Location = new System.Drawing.Point(402, 375);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(396, 75);
+            this.btnExit.TabIndex = 4;
+            this.btnExit.Text = "Exit Without Saving";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            // 
+            // txtArtworkWidth
+            // 
+            this.txtArtworkWidth.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtArtworkWidth.Location = new System.Drawing.Point(159, 207);
+            this.txtArtworkWidth.Name = "txtArtworkWidth";
+            this.txtArtworkWidth.Size = new System.Drawing.Size(658, 22);
+            this.txtArtworkWidth.TabIndex = 18;
+            // 
+            // txtArtworkHeight
+            // 
+            this.txtArtworkHeight.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtArtworkHeight.Location = new System.Drawing.Point(159, 236);
+            this.txtArtworkHeight.Name = "txtArtworkHeight";
+            this.txtArtworkHeight.Size = new System.Drawing.Size(658, 22);
+            this.txtArtworkHeight.TabIndex = 19;
             // 
             // SettingsForm
             // 
@@ -305,5 +360,9 @@
         private System.Windows.Forms.Label lblArtworkOutputFile;
         private System.Windows.Forms.Label lblAlbumOutputFile;
         private System.Windows.Forms.TextBox txtArtworkOutputFile;
+        private System.Windows.Forms.Label lblArtworkWidth;
+        private System.Windows.Forms.Label lblArtworkHeight;
+        private System.Windows.Forms.TextBox txtArtworkWidth;
+        private System.Windows.Forms.TextBox txtArtworkHeight;
     }
 }

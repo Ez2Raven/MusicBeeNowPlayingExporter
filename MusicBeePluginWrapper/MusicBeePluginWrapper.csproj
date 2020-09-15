@@ -91,6 +91,7 @@
     <Compile Include="CustomForms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="UIHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
