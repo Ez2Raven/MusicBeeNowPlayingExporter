@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using MusicBeeExporter.Configurations;
-using MusicBeeExporter.ImageProcessing;
+using MusicBeeExporter.Imaging;
 using Newtonsoft.Json;
 
 namespace MusicBeePlugin
