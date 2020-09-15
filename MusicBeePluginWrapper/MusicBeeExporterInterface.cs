@@ -2,6 +2,7 @@
 using System.IO;
 using MusicBeeExporter.Configurations;
 using MusicBeeExporter.Imaging;
+using MusicBeePlugin.CustomForms;
 using Newtonsoft.Json;
 
 namespace MusicBeePlugin
@@ -61,6 +62,8 @@ namespace MusicBeePlugin
                     _pluginSettings = new MusicBeeExporterSettings(persistenceSettings);
                     _repo.SavePluginSettings(_pluginSettings);
                 }
+
+                CreateMenuItem();
             }
             catch (Exception ex)
             {
@@ -172,6 +175,17 @@ namespace MusicBeePlugin
 
                     break;
             }
+        }
+
+        private void CreateMenuItem()
+        {
+            _mbApiInterface.MB_AddMenuItem("mnuTools/Generate Custom Track Info", "HotKey to generate customized outputs for MusicBee Exporter", MenuClicked);
+        }
+
+        private void MenuClicked(object sender, EventArgs args)
+        {
+            GenerateCustomizedOutputForm customizedOutputForm = new GenerateCustomizedOutputForm(_pluginSettings);
+            customizedOutputForm.Show();
         }
 
         // return an array of lyric or artworkBase64 provider names this plugin supports
