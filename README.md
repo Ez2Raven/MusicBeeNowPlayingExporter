@@ -1,3 +1,8 @@
+# This Project is no longer maintained
+I have moved on to using Roon as my main audio player for high fidelity music.
+There is not much documentation for MusicBee despite it being a closed source project which also contributed as a major push factor.
+
+
 # MusicBee Now Playing Exporter
 > based on MusicBee API v3.1
 
